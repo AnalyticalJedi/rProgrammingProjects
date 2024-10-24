@@ -1,0 +1,207 @@
+rm(api_key)
+---
+title: "Bellabeat Capstone Case Study"
+author: "Thornton Cherry"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Scenario
+
+You are a junior data analyst working on the marketing analyst team at Bellabeat, a high-tech manufacturer of health-focused products for women. Bellabeat is a successful small company, but they have the potential to become a larger player in the global smart device market. Urška Sršen, cofounder and Chief Creative Officer of Bellabeat, believes that analyzing smart device fitness data could help unlock new growth opportunities for the company. 
+
+## Business Tasks
+
+You have been asked to focus on one of Bellabeat’s products and analyze smart device data to gain insight into how consumers are using their smart devices. The insights you discover will then help guide marketing strategy for the company. You will present your analysis to the Bellabeat executive team along with your high-level recommendations for Bellabeat’s marketing strategy.
+
+## About The Company
+
+Bellabeat, a high-tech company that manufactures health-focused smart products. Sršen used her background as an artist to develop beautifully designed technology that informs and inspires women around the world. Collecting data on activity, sleep, stress, and reproductive health has allowed Bellabeat to empower women with knowledge about their own health and habits. Since it was founded in 2013, Bellabeat has grown rapidly and quickly positioned itself as a tech-driven wellness company for women.
+
+## Key Stakeholders
+○ Urška Sršen: Bellabeat’s cofounder and Chief Creative Officer
+
+○ Sando Mur: Mathematician and Bellabeat’s cofounder; key member of the Bellabeat executive team
+
+○ Bellabeat marketing analytics team: A team of data analysts responsible for collecting, analyzing,and reporting data that helps guide Bellabeat’s marketing strategy. You joined this team six months ago and have been busy learning about Bellabeat’’s mission and business goals — as well as how you, as a junior data analyst, can help Bellabeat achieve them.
+
+## Questions To Answer:
+1. What are some trends in smart device usage?
+2. How could these trends apply to Bellabeat customers?
+3. How could these trends help influence Bellabeat marketing strategy?
+
+## Packages Used In This Presentation:
+```{r}
+library(tidyverse)
+library(dplyr)
+library(janitor)
+library(lubridate)
+```
+
+
+## Imported Datasets
+All data in this report was pulled, cleaned, and analyzed from this Data located here:https://www.kaggle.com/datasets/arashnic/fitbit
+
+```{r}
+DailyActivity <- read.csv("dailyActivity_merged.csv")
+SleepDay <- read.csv("sleepDay_merged.csv")
+Weight <- read.csv("weightLogInfo_merged.csv")
+MinutesSleep <- read.csv("minuteSleep_merged.csv")
+HourlySteps <- read.csv("hourlySteps_merged.csv")
+Intensities <-read.csv("hourlyIntensities_merged.csv")
+HourlyCalories <- read.csv("hourlyCalories_merged.csv")
+HeartRate <- read.csv("heartrate_seconds_merged.csv")
+```
+
+
+Let's check Daily to make sure the data imported correctly:
+```{r}
+head(DailyActivity)
+```
+
+Look for how many unique participants were involved in each study
+
+```{r}
+n_distinct(Daily2$Id)
+n_distinct(HourlySteps2$Id)
+n_distinct(MinutesSleep2$Id)
+n_distinct(Sleep2$Id)
+n_distinct(Weight2$Id)
+n_distinct(Intensities$Id)
+n_distinct(Calories$Id)
+n_distinct(HeartRate$Id)
+```
+This information tells us about number participants in each data sets.
+
+There are 33 participants in the activity, calories and intensities data sets, 24 in the sleep and only 8 in the weight data set. 8 participants is not significant to make any recommendations and conclusions based on this data.
+
+We'll look at the summary statistics of the data sets now:
+
+```{r}
+#DailyActivity
+Daily2 %>%  
+  select(TotalSteps,TotalDistance,SedentaryMinutes,Calories) %>%
+summary()
+
+#Active Minutes  
+Daily2 %>%
+  select(VeryActiveMinutes, FairlyActiveMinutes, LightlyActiveMinutes) %>%
+summary()
+
+#Active Distance
+Daily2 %>%
+  select(VeryActiveDistance, ModeratelyActiveDistance, LightActiveDistance)%>%
+summary()
+
+#Calories
+Calories %>%
+  select(Calories) %>%
+  summary()
+
+#Sleep
+Sleep2 %>%
+  select(TotalSleepRecords, TotalMinutesAsleep, TotalTimeInBed) %>%
+  summary()
+
+#Weight
+Weight2 %>%
+  select(WeightKg, BMI) %>%
+  summary()
+
+```
+The results from the above information:
+
+○ Average sedentary time is 991 minutes or 16 hours. 
+
+○ The majority of the participants are lightly active.
+
+○ On the average, participants sleep 1 time for 7 hours.
+
+## Merging Data
+
+Now it's time to merge the data - using outer join for merge by looking at the "Id" between both datasets: Daily2 and Sleep2.
+
+```{r}
+combined_data <- merge(Daily2, Sleep2, by =  "Id", all =TRUE)
+```
+
+Next we want to make sure the merge was successful. So let's check
+```{r}
+head(combined_data)
+```
+
+
+## The Visuals 
+The product we'll be looking at is the Bellabeat App. What we'll be plotting the data to gain insight on how consumers are using their Bellabeat App
+
+Total Steps Vs. Calories Burned
+
+```{r}
+ggplot(data = Daily2, 
+       mapping = aes(x=TotalSteps, y=Calories))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = "Total Steps vs Calories Burned")
+```
+
+
+
+From the looks the data, the more you're active, the more calories get burned. Bottom line, be active. 
+
+
+
+Total Minutes Asleep Vs Total Time In Bed
+```{r}
+ggplot(data = Sleep2, 
+       mapping = aes(x = TotalMinutesAsleep, y=TotalTimeInBed))+
+  geom_point()+
+  geom_smooth()+
+  labs(title = "Total Minutes Asleep VS Total Time In Bed")
+```
+
+
+
+
+The relationship between Total Minutes Asleep and Total Time in Bed looks linear. So if the Bellabeat users want to improve their sleep, they must consider using notifications to go to sleep.
+
+
+Total Distance Vs Calories Burned
+```{r}
+ggplot (data = combined_data, 
+        mapping = aes(x = TotalDistance, y=Calories))+
+          geom_point()+
+          geom_smooth()+
+          labs(title = "Total Distance VS Calories Burned")
+```
+
+
+
+
+
+
+## Summary of Analysis
+From this summary, consumers are meeting an average of 7638 steps a day. Havard Health suggests that there is benefit for meeting a 7500 step goal a day. (link)https://www.health.harvard.edu/staying-healthy/how-many-steps-should-i-take-each-day. The cdc recommends getting more the 7 hours or more of sleep a night where in this data, the mean is less than 7. (link)https://www.cdc.gov/sleep/about_sleep/how_much_sleep.html 
+
+There was a connection between total steps and calories burned. There was also a connection between active minutes and calories burned. There was not a correlation between hours of sleep and calories burned except when total hours slept was over ten hours then there was a negative correlation.
+
+Although my summary earlier suggested participants averaged about 7 hours of sleep, individually some participants were averaging less than 7.
+
+## My Recommendation
+The message Bellabeat should push is if people purchase and wear the Bellabeat activity tracker and wear them consistently, Bellabeat can use their data to help make suggestions to try and help improve your overall health.
+
+## Problems I Found With The Dataset/Analysis
+
+○ The data set was not large enough to come to any valid conclusions about the population as a whole. The data did not include information about the individuals such as gender, height, ethnicity, ect..
+
+
+○ The data set did not include how often people were not wearing their activity tracker, likely daily missing data; such as when their devices are being charged.
+
+
+○ Tracker accuracy is to be determined. There could be a discrepancy compared to other tracking methods such as: steps, calories burnt, sleep, ect. was being tracked accurately.
