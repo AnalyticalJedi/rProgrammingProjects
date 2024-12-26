@@ -54,16 +54,12 @@ Data for this project was sourced from Kaggle’s Fitbit dataset:
 ---
 
 ## Visualizations
-### Total Steps vs Calories Burned
-![Total Steps vs Calories Burned](path_to_visualization)
-- **Insight**: Increased activity leads to more calories burned.
-
 ### Total Minutes Asleep vs Total Time In Bed
-![Sleep Data Visualization](path_to_visualization)
+![Sleep Data Visualization](TotalTimeInBedTotalMinutesAsleepRplot.png)
 - **Insight**: Strong linear relationship, suggesting users benefit from sleep notifications.
 
 ### Total Distance vs Calories Burned
-![Distance vs Calories Visualization](path_to_visualization)
+![Distance vs Calories Visualization](TotalDistanceVCaloriesBurnedRplot.png)
 - **Insight**: Distance traveled correlates positively with calories burned.
 
 ---
